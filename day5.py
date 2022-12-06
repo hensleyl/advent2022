@@ -1,16 +1,25 @@
 import re
 
 
+def block(line, i):
+    return line[i * 4 + 1:i * 4 + 2]
+
+
 def parse_stack(lines):
     lines = lines.copy()
     num_stacks = int(lines.pop().split()[-1])
     lines = list(reversed(lines))
-    return [[line[i * 4 + 1:i * 4 + 2] for line in lines if line[i * 4 + 1:i * 4 + 2].strip()] for i
-            in range(num_stacks)]
+    return [[block(line, i) for line in lines if block(line, i).strip()] for i in range(num_stacks)]
 
 
 def print_tops(stacks):
     print(''.join([s.pop() for s in stacks]))
+
+
+def move(stacks, f, t, count, method):
+    bottom = len(stacks[f - 1]) - count
+    stacks[t - 1] += method(stacks[f - 1][bottom:])
+    del stacks[f - 1][bottom:]
 
 
 with open('data/day5.txt') as data:
@@ -26,10 +35,8 @@ with open('data/day5.txt') as data:
     for line in data:
         m = re.match(r'move (\d+) from (\d) to (\d)', line)
         count, f, t = [int(x) for x in m.groups()]
-        for i in range(count):
-            p1_stacks[t - 1].append(p1_stacks[f - 1].pop())
-        p2_stacks[t-1] += p2_stacks[f-1][len(p2_stacks[f-1])-count:len(p2_stacks[f-1])]
-        del p2_stacks[f-1][len(p2_stacks[f-1])-count:len(p2_stacks[f-1])]
+        move(p1_stacks, f, t, count, reversed)
+        move(p2_stacks, f, t, count, list)
 
     print('Part 1')
     print_tops(p1_stacks)
