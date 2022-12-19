@@ -1,5 +1,3 @@
-from math import copysign
-
 DIRECTIONS = {
     'U': (0, 1),
     'D': (0, -1),
@@ -42,9 +40,9 @@ def step_snake(snake, direction):
         front, current = snake[i: i + 2]
         delta_x = front[0] - current[0]
         delta_y = front[1] - current[1]
-        if delta_x ** 2 + delta_y ** 2 > 2:
-            current[0] += copysign(min(abs(delta_x), 1), delta_x)
-            current[1] += copysign(min(abs(delta_y), 1), delta_y)
+        if abs(delta_x) > 1 or abs(delta_y) > 1:
+            current[0] += max(min(delta_x, 1), -1)
+            current[1] += max(min(delta_y, 1), -1)
         else:
             break
 
@@ -58,7 +56,7 @@ def wiggle_snake(length, fn):
             line = line.rstrip()
             direction, count = line.split()
             count = int(count)
-            for i in range(count):
+            for _ in range(count):
                 step_snake(snake, direction)
                 seen.add(tuple(snake[-1]))
     return len(seen)
